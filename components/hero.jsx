@@ -32,7 +32,6 @@ const FEATURES = [
     icon: Headphones,
     title: "Support 24/7",
     description: "Nous sommes là pour vous aider à tout moment",
-    accent: "copper",
   },
   {
     icon: MapPin,
@@ -106,14 +105,7 @@ export function Hero() {
           <div className="grid grid-cols-2 gap-x-4 gap-y-5 pt-2 sm:gap-x-10">
             {FEATURES.map((feature) => (
               <div key={feature.title} className="flex items-start gap-3">
-                <span
-                  className={cn(
-                    "flex size-11 shrink-0 items-center justify-center rounded-full",
-                    feature.accent === "copper"
-                      ? "bg-copper/15 text-copper"
-                      : "bg-accent-warm/15 text-accent-warm",
-                  )}
-                >
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-accent-warm/15 text-accent-warm">
                   <feature.icon className="size-5" />
                 </span>
                 <div>
