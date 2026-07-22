@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
 import { Geist_Mono, Montserrat, Playfair_Display } from "next/font/google";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { SmoothScroll } from "@/components/layout/smooth-scroll";
 import { SplashScreen } from "@/components/layout/splash-screen";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -21,17 +21,13 @@ const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "SwiftWay — Livrer la Confiance",
   description:
     "Plateforme premium de gestion de livraisons. Créez un compte, passez des commandes de livraison et suivez-les en temps réel.",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }) {
   return (
     <html
       lang="fr"
@@ -44,6 +40,7 @@ export default function RootLayout({
           {children}
           <Footer />
         </SmoothScroll>
+        <Toaster position="top-center" richColors />
       </body>
     </html>
   );

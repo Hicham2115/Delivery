@@ -2,7 +2,7 @@ import { Heart, Star } from "lucide-react";
 
 import { Reveal } from "@/components/reveal";
 
-function Stars({ count }: { count: number }) {
+function Stars({ count }) {
   return (
     <div className="flex items-center gap-0.5 text-copper">
       {Array.from({ length: 5 }).map((_, index) => (

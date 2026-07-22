@@ -8,17 +8,11 @@ import {
   Package,
   ShieldCheck,
   Truck,
-  type LucideIcon,
 } from "lucide-react";
 
 import { Reveal } from "@/components/reveal";
 
-const STEPS: {
-  number: number;
-  icon: LucideIcon;
-  title: string;
-  description: string;
-}[] = [
+const STEPS = [
   {
     number: 1,
     icon: IdCard,
@@ -48,7 +42,7 @@ const STEPS: {
   },
 ];
 
-const HIGHLIGHTS: { icon: LucideIcon; title: string; description: string }[] = [
+const HIGHLIGHTS = [
   {
     icon: ShieldCheck,
     title: "Sécurisé et Sûr",

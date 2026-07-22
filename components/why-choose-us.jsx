@@ -8,19 +8,13 @@ import {
   MapPinned,
   Receipt,
   UserCheck,
-  type LucideIcon,
 } from "lucide-react";
 
 import { Reveal } from "@/components/reveal";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const BENEFITS: {
-  icon: LucideIcon;
-  title: string;
-  description: string;
-  accent?: "copper";
-}[] = [
+const BENEFITS = [
   {
     icon: CarFront,
     title: "Flotte Premium",

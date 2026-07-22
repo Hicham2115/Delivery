@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Box, Hexagon, Menu, User, X } from "lucide-react";
 
+import { AuthDialog } from "@/components/auth-dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +22,13 @@ export function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState("signup");
+
+  const openAuth = (mode) => {
+    setAuthMode(mode);
+    setAuthOpen(true);
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -79,15 +87,13 @@ export function Header() {
           <Button
             variant="outline"
             className="hidden md:inline-flex py-5 font-semibold text-white"
-            nativeButton={false}
-            render={<Link href="/login" />}
+            onClick={() => openAuth("login")}
           >
             Connexion
           </Button>
           <Button
             className="hidden bg-gold font-semibold text-gold-foreground hover:bg-gold/85 md:inline-flex py-5"
-            nativeButton={false}
-            render={<Link href="/signup" />}
+            onClick={() => openAuth("signup")}
           >
             <User />
             Créer un Compte
@@ -98,7 +104,7 @@ export function Header() {
             aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen((open) => !open)}
-            className="flex size-9 items-center justify-center rounded-lg text-foreground md:hidden"
+            className="flex size-9 cursor-pointer items-center justify-center rounded-lg text-foreground md:hidden"
           >
             {mobileOpen ? (
               <X className="size-5" />
@@ -131,15 +137,19 @@ export function Header() {
             <Button
               variant="outline"
               className="w-full text-foreground"
-              nativeButton={false}
-              render={<Link href="/login" />}
+              onClick={() => {
+                setMobileOpen(false);
+                openAuth("login");
+              }}
             >
               Connexion
             </Button>
             <Button
               className="w-full bg-gold text-gold-foreground hover:bg-gold/85"
-              nativeButton={false}
-              render={<Link href="/signup" />}
+              onClick={() => {
+                setMobileOpen(false);
+                openAuth("signup");
+              }}
             >
               <User />
               Créer un Compte
@@ -147,6 +157,13 @@ export function Header() {
           </div>
         </div>
       )}
+
+      <AuthDialog
+        open={authOpen}
+        onOpenChange={setAuthOpen}
+        mode={authMode}
+        onModeChange={setAuthMode}
+      />
     </header>
   );
 }

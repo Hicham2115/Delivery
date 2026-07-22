@@ -10,19 +10,12 @@ import {
   ShoppingBag,
   Star,
   Zap,
-  type LucideIcon,
 } from "lucide-react";
 
 import { Reveal } from "@/components/reveal";
 import { cn } from "@/lib/utils";
 
-const STATS: {
-  icon: LucideIcon;
-  value: string;
-  label: string;
-  description: string;
-  accent?: "copper";
-}[] = [
+const STATS = [
   {
     icon: Package,
     value: "25K+",
@@ -51,7 +44,7 @@ const STATS: {
   },
 ];
 
-const CLIENTS: { icon: LucideIcon; name: string; sub?: string }[] = [
+const CLIENTS = [
   { icon: Hexagon, name: "TechNova", sub: "SOLUTIONS" },
   { icon: ShoppingBag, name: "UrbanMart" },
   { icon: Layers, name: "BuildCo.", sub: "CONSTRUCTION" },

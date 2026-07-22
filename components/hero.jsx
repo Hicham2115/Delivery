@@ -10,7 +10,6 @@ import {
   Star,
   Truck,
   Zap,
-  type LucideIcon,
 } from "lucide-react";
 
 import { Reveal } from "@/components/reveal";
@@ -18,12 +17,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import heroImage from "@/app/assets/hero.png";
 
-const FEATURES: {
-  icon: LucideIcon;
-  title: string;
-  description: string;
-  accent?: "copper";
-}[] = [
+const FEATURES = [
   {
     icon: ShieldCheck,
     title: "Sécurisé et Sûr",
@@ -47,9 +41,7 @@ const FEATURES: {
   },
 ];
 
-type StepStatus = "completed" | "current" | "upcoming";
-
-const STEPS: { icon: LucideIcon; label: string; status: StepStatus }[] = [
+const STEPS = [
   { icon: Package, label: "Commande Passée", status: "completed" },
   { icon: Truck, label: "En Transit", status: "current" },
   { icon: MapPin, label: "En Cours de Livraison", status: "upcoming" },

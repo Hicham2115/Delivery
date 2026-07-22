@@ -1,22 +1,13 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { motion, type Variants } from "motion/react";
+import { motion } from "motion/react";
 
-const variants: Variants = {
+const variants = {
   hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0 },
 };
 
-export function Reveal({
-  children,
-  delay = 0,
-  className,
-}: {
-  children: ReactNode;
-  delay?: number;
-  className?: string;
-}) {
+export function Reveal({ children, delay = 0, className }) {
   return (
     <motion.div
       initial="hidden"
