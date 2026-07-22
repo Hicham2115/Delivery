@@ -40,7 +40,7 @@ export function Cta() {
             <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
               <Button
                 size="lg"
-                className="h-12 w-full gap-2 rounded-full bg-gold px-6 text-base text-gold-foreground hover:bg-gold/85 sm:w-auto"
+                className="h-12 w-full gap-2 rounded-lg bg-gold px-6 text-base text-gold-foreground hover:bg-gold/85 sm:w-auto"
                 nativeButton={false}
                 render={<Link href="/signup" />}
               >
@@ -50,7 +50,7 @@ export function Cta() {
               <Button
                 size="lg"
                 variant="outline"
-                className="h-12 w-full gap-2 rounded-full border-copper/30 px-6 text-base text-copper hover:bg-copper/10 hover:text-copper sm:w-auto"
+                className="h-12 w-full gap-2 rounded-lg border-copper/30 px-6 text-base text-copper hover:bg-copper/10 hover:text-copper sm:w-auto"
                 nativeButton={false}
                 render={<Link href="/contact" />}
               >

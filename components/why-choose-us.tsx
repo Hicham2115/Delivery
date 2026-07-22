@@ -80,15 +80,13 @@ export function WhyChooseUs() {
             </h2>
 
             <p className="max-w-md text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Nous combinons un service premium, des professionnels vérifiés
-              et une technologie de pointe pour vous offrir une expérience de
+              Nous combinons un service premium, des professionnels vérifiés et
+              une technologie de pointe pour vous offrir une expérience de
               livraison sur laquelle vous pouvez toujours compter.
             </p>
 
             <div className="flex items-center gap-4 rounded-2xl border border-gold/20 bg-card/40 p-5">
-              <span className="text-3xl font-semibold text-gold">
-                98%
-              </span>
+              <span className="text-3xl font-semibold text-gold">98%</span>
               <span className="h-10 w-px bg-border" />
               <p className="max-w-40 text-sm text-muted-foreground">
                 des clients jugent leur expérience de livraison excellente.
@@ -97,7 +95,7 @@ export function WhyChooseUs() {
 
             <Button
               size="lg"
-              className="h-12 gap-2 rounded-full bg-gold px-6 text-base text-gold-foreground hover:bg-gold/85"
+              className="h-12 gap-2 rounded-lg bg-gold px-6 text-base text-gold-foreground hover:bg-gold/85"
               nativeButton={false}
               render={<Link href="/signup" />}
             >
@@ -125,7 +123,7 @@ export function WhyChooseUs() {
                     <benefit.icon className="size-5" />
                   </span>
                   <div>
-                    <p className="font-heading text-lg font-semibold text-foreground">
+                    <p className=" text-lg font-semibold text-foreground">
                       {benefit.title}
                     </p>
                     <p className="mt-1 text-sm leading-relaxed text-muted-foreground">

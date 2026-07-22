@@ -117,7 +117,7 @@ export function SocialProof() {
           ))}
         </div>
 
-        <Reveal className="mt-20 flex flex-col items-center gap-8">
+        {/* <Reveal className="mt-20 flex flex-col items-center gap-8">
           <div className="flex items-center gap-4">
             <span className="h-px w-10 bg-copper/40" />
             <span className="text-sm font-medium tracking-wide text-gold">
@@ -146,7 +146,7 @@ export function SocialProof() {
               </div>
             ))}
           </div>
-        </Reveal>
+        </Reveal> */}
       </div>
     </section>
   );

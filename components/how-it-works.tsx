@@ -48,29 +48,28 @@ const STEPS: {
   },
 ];
 
-const HIGHLIGHTS: { icon: LucideIcon; title: string; description: string }[] =
-  [
-    {
-      icon: ShieldCheck,
-      title: "Sécurisé et Sûr",
-      description: "Vos colis sont toujours protégés.",
-    },
-    {
-      icon: Clock,
-      title: "Livraison à l'Heure",
-      description: "Nous livrons à l'heure, à chaque fois.",
-    },
-    {
-      icon: MapPin,
-      title: "Suivi en Temps Réel",
-      description: "Suivez vos commandes à tout moment, de n'importe où.",
-    },
-    {
-      icon: Headphones,
-      title: "Support 24/7",
-      description: "Notre équipe de support est toujours là pour vous aider.",
-    },
-  ];
+const HIGHLIGHTS: { icon: LucideIcon; title: string; description: string }[] = [
+  {
+    icon: ShieldCheck,
+    title: "Sécurisé et Sûr",
+    description: "Vos colis sont toujours protégés.",
+  },
+  {
+    icon: Clock,
+    title: "Livraison à l'Heure",
+    description: "Nous livrons à l'heure, à chaque fois.",
+  },
+  {
+    icon: MapPin,
+    title: "Suivi en Temps Réel",
+    description: "Suivez vos commandes à tout moment, de n'importe où.",
+  },
+  {
+    icon: Headphones,
+    title: "Support 24/7",
+    description: "Notre équipe de support est toujours là pour vous aider.",
+  },
+];
 
 export function HowItWorks() {
   return (
@@ -125,7 +124,7 @@ export function HowItWorks() {
                 </>
               )}
 
-              <span className="absolute -top-6 left-1/2 flex size-12 -translate-x-1/2 items-center justify-center rounded-full border-2 border-gold bg-background font-heading text-lg font-semibold text-gold shadow-[0_0_20px_-4px_var(--gold)]">
+              <span className="absolute -top-6 left-1/2 flex size-12 -translate-x-1/2 items-center justify-center rounded-full border-2 border-gold bg-background  text-lg font-semibold text-gold shadow-[0_0_20px_-4px_var(--gold)]">
                 {step.number}
               </span>
 
@@ -134,7 +133,7 @@ export function HowItWorks() {
               </span>
 
               <div className="flex flex-col gap-2">
-                <p className="font-heading text-lg font-semibold text-foreground">
+                <p className=" text-lg font-semibold text-foreground">
                   {step.title}
                 </p>
                 <span className="mx-auto h-px w-6 bg-gold/40" />
