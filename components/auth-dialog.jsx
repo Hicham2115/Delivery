@@ -47,7 +47,7 @@ function FieldInput({ icon: Icon, ...props }) {
       <Icon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
       <Input
         {...props}
-        className="h-11 rounded-lg border-border bg-background/60 pl-9 focus-visible:border-gold/50 focus-visible:ring-gold/20"
+        className="h-11 rounded-lg border-white/15 bg-white/5 pl-9 focus-visible:border-white/40 focus-visible:ring-white/15"
       />
     </div>
   );
@@ -58,7 +58,7 @@ function SubmitButton({ canSubmit, isSubmitting, label }) {
     <Button
       type="submit"
       disabled={!canSubmit || isSubmitting}
-      className="mt-1 h-12 gap-2 rounded-lg bg-gold text-base font-semibold text-gold-foreground hover:bg-gold/85"
+      className="mt-1 h-12 gap-2 rounded-lg border border-gold/40 bg-gold/15 text-base font-semibold text-gold backdrop-blur-sm hover:bg-gold/25"
     >
       {isSubmitting ? (
         <Loader2 className="size-4 animate-spin" />
@@ -297,14 +297,14 @@ export function AuthDialog({ open, onOpenChange, mode, onModeChange }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton
-        className="dark w-full max-w-md gap-0 overflow-hidden rounded-2xl border border-gold/20 border-l-2 border-l-gold bg-popover p-0 text-popover-foreground shadow-2xl shadow-black/50 ring-1 ring-white/5 sm:max-w-lg"
+        className="dark w-full max-w-md gap-0 overflow-hidden rounded-2xl border border-white/15 bg-black/70 p-0 text-popover-foreground shadow-2xl shadow-black/50 ring-1 ring-white/10 backdrop-blur-2xl sm:max-w-lg"
       >
         <div
           aria-hidden
-          className="pointer-events-none absolute -top-20 left-1/2 -z-10 h-56 w-100 -translate-x-1/2 rounded-full bg-gold/10 blur-3xl"
+          className="pointer-events-none absolute -top-20 left-1/2 -z-10 h-56 w-100 -translate-x-1/2 rounded-full bg-white/10 blur-3xl"
         />
 
-        <div className="flex flex-col items-center gap-3 border-b border-border px-8 pt-9 pb-6 text-center">
+        <div className="flex flex-col items-center gap-3 border-b border-white/10 px-8 pt-9 pb-6 text-center">
           <span className="relative flex size-10 shrink-0 items-center justify-center">
             <Hexagon className="size-10 text-gold" strokeWidth={1.5} />
             <Box className="absolute size-4.5 text-gold" strokeWidth={2} />
