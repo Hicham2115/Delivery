@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -12,7 +13,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCreateColis } from "@/hooks/use-create-colis";
-import { useColisStore } from "@/stores/use-colis-store";
 
 const destinataireSchema = z.string().min(2, "Destinataire requis");
 const telephoneSchema = z
@@ -44,8 +44,8 @@ function fieldErrorMessage(errors) {
 
 export function ColisForm() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const createColis = useCreateColis();
-  const addColis = useColisStore((state) => state.addColis);
 
   const form = useForm({
     defaultValues: {
@@ -63,9 +63,9 @@ export function ColisForm() {
     },
     onSubmit: async ({ value, formApi }) => {
       try {
-        const created = await createColis.mutateAsync(value);
-        addColis(created);
-        toast.success(`Colis ${created.code} créé avec succès.`);
+        await createColis.mutateAsync(value);
+        queryClient.invalidateQueries({ queryKey: ["colis"] });
+        toast.success(`Colis créé avec succès.`);
         formApi.reset();
         router.push("/dashboard/colis");
       } catch {

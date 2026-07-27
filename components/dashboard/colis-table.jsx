@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -22,10 +23,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useColisStore } from "@/stores/use-colis-store";
+import { useColis } from "@/hooks/use-colis";
 
 const PAGE_SIZE_OPTIONS = ["10", "25", "50"];
 const ALL = "tous";
+const SKELETON_ROWS = 5;
 
 const ETAT_BADGE_CLASS = {
   "Facturé": "border-violet-400/40 text-violet-400",
@@ -58,7 +60,7 @@ function exportColisCsv(rows, filename) {
 }
 
 export function ColisTable() {
-  const colis = useColisStore((state) => state.colis);
+  const { data: colis = [], isLoading, isError } = useColis();
   const [search, setSearch] = useState("");
   const [etatFilter, setEtatFilter] = useState(ALL);
   const [statusFilter, setStatusFilter] = useState(ALL);
@@ -219,7 +221,47 @@ export function ColisTable() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginated.length === 0 && (
+              {isLoading &&
+                Array.from({ length: SKELETON_ROWS }).map((_, index) => (
+                  <TableRow key={index}>
+                    <TableCell>
+                      <Skeleton className="h-4 w-28" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-24" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-24" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-5 w-20 rounded-full" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-5 w-20 rounded-full" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-20" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-14" />
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex justify-end gap-1.5">
+                        <Skeleton className="size-7 rounded-md" />
+                        <Skeleton className="size-7 rounded-md" />
+                        <Skeleton className="size-7 rounded-md" />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              {isError && (
+                <TableRow>
+                  <TableCell colSpan={8} className="py-8 text-center text-destructive">
+                    Erreur lors du chargement des colis.
+                  </TableCell>
+                </TableRow>
+              )}
+              {!isLoading && !isError && paginated.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={8} className="py-8 text-center text-muted-foreground">
                     Aucun colis trouvé.
