@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -13,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCreateColis } from "@/hooks/use-create-colis";
+import { useUpdateColis } from "@/hooks/use-update-colis";
 
 const destinataireSchema = z.string().min(2, "Destinataire requis");
 const telephoneSchema = z
@@ -42,34 +42,42 @@ function fieldErrorMessage(errors) {
   return null;
 }
 
-export function ColisForm() {
+export function ColisForm({ colis, onSuccess }) {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const createColis = useCreateColis();
+  const updateColis = useUpdateColis();
+  const isEditing = Boolean(colis);
 
   const form = useForm({
     defaultValues: {
-      destinataire: "",
-      telephone: "",
-      ville: "",
-      adresse: "",
-      marchandise: "",
-      quantite: "",
-      commentaire: "",
-      prix: "",
-      interditOuverture: false,
-      colisARemplacer: false,
-      colisDeStock: false,
+      destinataire: colis?.destinataire ?? "",
+      telephone: colis?.telephone ?? "",
+      ville: colis?.ville ?? "",
+      adresse: colis?.adresse ?? "",
+      quantite: colis?.quantite != null ? String(colis.quantite) : "",
+      commentaire: colis?.commentaire ?? "",
+      prix: colis?.prix != null ? String(colis.prix) : "",
+      interditOuverture: colis?.interditOuverture ?? false,
+      colisARemplacer: colis?.colisARemplacer ?? false,
     },
     onSubmit: async ({ value, formApi }) => {
       try {
-        await createColis.mutateAsync(value);
-        queryClient.invalidateQueries({ queryKey: ["colis"] });
-        toast.success(`Colis créé avec succès.`);
-        formApi.reset();
-        router.push("/dashboard/colis");
+        if (isEditing) {
+          await updateColis.mutateAsync({ id: colis.id, data: value });
+          toast.success("Colis modifié avec succès.");
+          onSuccess?.();
+        } else {
+          await createColis.mutateAsync(value);
+          toast.success("Colis créé avec succès.");
+          formApi.reset();
+          if (onSuccess) {
+            onSuccess();
+          } else {
+            router.push("/dashboard/colis");
+          }
+        }
       } catch {
-        // error toast already surfaced by useCreateColis's onError
+        // error toast already surfaced by the mutation's onError
       }
     },
   });
@@ -191,23 +199,6 @@ export function ColisForm() {
           </CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <form.Field name="marchandise">
-            {(field) => (
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor={field.name}>Marchandise</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="Marchandise"
-                  className="h-11 rounded-lg border-white/15 bg-white/5"
-                />
-              </div>
-            )}
-          </form.Field>
-
           <form.Field name="quantite" validators={{ onSubmit: quantiteSchema }}>
             {(field) => (
               <div className="flex flex-col gap-1.5">
@@ -265,6 +256,10 @@ export function ColisForm() {
                   placeholder="Prix *"
                   className="h-11 rounded-lg border-white/15 bg-white/5"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Hors frais de livraison. Ces frais seront prélevés à la
+                  livraison du colis.
+                </p>
                 {field.state.meta.errors.length > 0 && (
                   <p className="text-xs text-destructive">
                     {fieldErrorMessage(field.state.meta.errors)}
@@ -304,18 +299,6 @@ export function ColisForm() {
               </label>
             )}
           </form.Field>
-
-          <form.Field name="colisDeStock">
-            {(field) => (
-              <label className="flex cursor-pointer items-center gap-2 text-sm text-foreground">
-                <Checkbox
-                  checked={field.state.value}
-                  onCheckedChange={(checked) => field.handleChange(!!checked)}
-                />
-                Colis de Stock
-              </label>
-            )}
-          </form.Field>
         </CardContent>
       </Card>
 
@@ -337,7 +320,11 @@ export function ColisForm() {
               disabled={!canSubmit || isSubmitting}
               className="bg-gold font-semibold text-gold-foreground hover:bg-gold/85 py-5 "
             >
-              {isSubmitting ? "Enregistrement..." : "Enregistrer"}
+              {isSubmitting
+                ? "Enregistrement..."
+                : isEditing
+                  ? "Enregistrer les modifications"
+                  : "Enregistrer"}
             </Button>
           )}
         </form.Subscribe>

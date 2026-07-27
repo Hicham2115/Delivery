@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Box, Hexagon, LayoutDashboard, PackagePlus, Package, Wallet } from "lucide-react";
+import { Box, Hexagon, Package } from "lucide-react";
 
 import {
   Sidebar,
@@ -15,20 +15,15 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-const NAV_ITEMS = [
-  { label: "Accueil", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Ajouter colis", href: "/dashboard/colis/new", icon: PackagePlus },
-  { label: "Liste des colis", href: "/dashboard/colis", icon: Package },
-  { label: "Paiements", href: "/dashboard/payments", icon: Wallet },
-];
+const NAV_ITEMS = [{ label: "Colis", href: "/admin", icon: Package }];
 
-export function AppSidebar() {
+export function AdminSidebar() {
   const pathname = usePathname();
 
   return (
     <Sidebar collapsible="icon" className="dark border-sidebar-border">
       <SidebarHeader>
-        <Link href="/dashboard" className="flex items-center gap-2.5 px-1.5 py-1">
+        <Link href="/admin" className="flex items-center gap-2.5 px-1.5 py-1">
           <span className="relative flex size-8 shrink-0 items-center justify-center">
             <Hexagon className="size-8 text-gold" strokeWidth={1.5} />
             <Box className="absolute size-3.5 text-gold" strokeWidth={2} />
@@ -38,7 +33,7 @@ export function AppSidebar() {
               SwiftWay
             </span>
             <span className="text-[9px] font-medium tracking-[0.2em] text-gold">
-              LIVRER LA CONFIANCE
+              ESPACE ADMIN
             </span>
           </span>
         </Link>

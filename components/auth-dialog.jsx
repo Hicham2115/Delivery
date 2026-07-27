@@ -7,6 +7,7 @@ import {
   Box,
   Check,
   Hexagon,
+  Landmark,
   Loader2,
   Lock,
   Mail,
@@ -34,8 +35,15 @@ const emailSchema = z.string().email("Adresse email invalide");
 const passwordSchema = z.string().min(8, "8 caractères minimum");
 const phoneSchema = z
   .string()
-  .refine((value) => value === "" || /^[+]?[\d\s()-]{8,20}$/.test(value), {
+  .min(1, "Numéro de téléphone requis")
+  .refine((value) => /^[+]?[\d\s()-]{8,20}$/.test(value), {
     message: "Numéro de téléphone invalide",
+  });
+const ribSchema = z
+  .string()
+  .min(1, "RIB requis")
+  .refine((value) => /^\d{24}$/.test(value.replace(/\s+/g, "")), {
+    message: "RIB invalide (24 chiffres attendus)",
   });
 
 const TRUST_ITEMS = [
@@ -59,7 +67,7 @@ function FieldInput({ icon: Icon, ...props }) {
       <Icon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
       <Input
         {...props}
-        className="h-11 rounded-lg border-white/15 bg-white/5 pl-9 focus-visible:border-white/40 focus-visible:ring-white/15"
+        className="h-10 rounded-lg border-white/15 bg-white/5 pl-9 focus-visible:border-white/40 focus-visible:ring-white/15 sm:h-11"
       />
     </div>
   );
@@ -70,7 +78,7 @@ function SubmitButton({ canSubmit, isSubmitting, label }) {
     <Button
       type="submit"
       disabled={!canSubmit || isSubmitting}
-      className="mt-1 h-12 gap-2 rounded-lg border border-gold/40 bg-gold/15 text-base font-semibold text-gold backdrop-blur-sm hover:bg-gold/25"
+      className="mt-1 h-11 gap-2 rounded-lg border border-gold/40 bg-gold/15 text-base font-semibold text-gold backdrop-blur-sm hover:bg-gold/25 sm:h-12"
     >
       {isSubmitting ? (
         <Loader2 className="size-4 animate-spin" />
@@ -88,13 +96,10 @@ function SignupForm({ onSuccess }) {
   const registerMutation = useRegister();
 
   const form = useForm({
-    defaultValues: { name: "", lastName: "", email: "", phone: "", password: "" },
+    defaultValues: { name: "", lastName: "", email: "", phone: "", rib: "", password: "" },
     onSubmit: async ({ value }) => {
       try {
-        await registerMutation.mutateAsync({
-          ...value,
-          phone: value.phone || undefined,
-        });
+        await registerMutation.mutateAsync(value);
         onSuccess(value.name);
       } catch {
         // error toast already surfaced by useRegister's onError
@@ -104,7 +109,7 @@ function SignupForm({ onSuccess }) {
 
   return (
     <form
-      className="flex flex-col gap-4"
+      className="flex flex-col gap-3 sm:gap-4"
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -114,7 +119,7 @@ function SignupForm({ onSuccess }) {
       <div className="grid grid-cols-2 gap-4">
         <form.Field name="name" validators={{ onSubmit: nameSchema }}>
           {(field) => (
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1 sm:gap-1.5">
               <Label htmlFor={field.name} className="text-foreground">
                 Prénom
               </Label>
@@ -139,7 +144,7 @@ function SignupForm({ onSuccess }) {
 
         <form.Field name="lastName" validators={{ onSubmit: lastNameSchema }}>
           {(field) => (
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1 sm:gap-1.5">
               <Label htmlFor={field.name} className="text-foreground">
                 Nom
               </Label>
@@ -165,10 +170,9 @@ function SignupForm({ onSuccess }) {
 
       <form.Field name="phone" validators={{ onSubmit: phoneSchema }}>
         {(field) => (
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1 sm:gap-1.5">
             <Label htmlFor={field.name} className="text-foreground">
-              Téléphone{" "}
-              <span className="text-muted-foreground">(optionnel)</span>
+              Téléphone
             </Label>
             <FieldInput
               icon={Phone}
@@ -192,7 +196,7 @@ function SignupForm({ onSuccess }) {
 
       <form.Field name="email" validators={{ onSubmit: emailSchema }}>
         {(field) => (
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1 sm:gap-1.5">
             <Label htmlFor={field.name} className="text-foreground">
               Email
             </Label>
@@ -216,9 +220,38 @@ function SignupForm({ onSuccess }) {
         )}
       </form.Field>
 
+      <form.Field name="rib" validators={{ onSubmit: ribSchema }}>
+        {(field) => (
+          <div className="flex flex-col gap-1 sm:gap-1.5">
+            <Label htmlFor={field.name} className="text-foreground">
+              RIB
+            </Label>
+            <FieldInput
+              icon={Landmark}
+              id={field.name}
+              name={field.name}
+              inputMode="numeric"
+              value={field.state.value}
+              onBlur={field.handleBlur}
+              onChange={(e) => field.handleChange(e.target.value)}
+              placeholder="24 chiffres, ex: 007780000123456789001234"
+              autoComplete="off"
+            />
+            <p className="text-xs text-muted-foreground">
+              Nécessaire pour vos versements de livraison.
+            </p>
+            {field.state.meta.errors.length > 0 && (
+              <p className="text-xs text-destructive">
+                {fieldErrorMessage(field.state.meta.errors)}
+              </p>
+            )}
+          </div>
+        )}
+      </form.Field>
+
       <form.Field name="password" validators={{ onSubmit: passwordSchema }}>
         {(field) => (
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1 sm:gap-1.5">
             <Label htmlFor={field.name} className="text-foreground">
               Mot de passe
             </Label>
@@ -254,7 +287,7 @@ function SignupForm({ onSuccess }) {
         )}
       </form.Subscribe>
 
-      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 pt-1">
+      <div className="hidden items-center justify-center gap-x-4 gap-y-1.5 pt-1 sm:flex sm:flex-wrap">
         {TRUST_ITEMS.map((item) => (
           <span
             key={item}
@@ -286,7 +319,7 @@ function LoginForm({ onSuccess }) {
 
   return (
     <form
-      className="flex flex-col gap-4"
+      className="flex flex-col gap-3 sm:gap-4"
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -295,7 +328,7 @@ function LoginForm({ onSuccess }) {
     >
       <form.Field name="email" validators={{ onSubmit: emailSchema }}>
         {(field) => (
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1 sm:gap-1.5">
             <Label htmlFor={field.name} className="text-foreground">
               Email
             </Label>
@@ -321,7 +354,7 @@ function LoginForm({ onSuccess }) {
 
       <form.Field name="password" validators={{ onSubmit: passwordSchema }}>
         {(field) => (
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1 sm:gap-1.5">
             <Label htmlFor={field.name} className="text-foreground">
               Mot de passe
             </Label>
@@ -381,17 +414,17 @@ export function AuthDialog({ open, onOpenChange, mode, onModeChange }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton
-        className="dark flex max-h-[calc(100vh-2rem)] w-full max-w-md flex-col gap-0 overflow-x-hidden overflow-y-auto rounded-2xl border border-white/15 bg-black/70 p-0 text-popover-foreground shadow-2xl shadow-black/50 ring-1 ring-white/10 backdrop-blur-2xl sm:max-w-lg"
+        className="dark flex max-h-[calc(100dvh-1.5rem)] w-full max-w-md flex-col gap-0 overflow-x-hidden overflow-y-auto rounded-2xl border border-white/15 bg-black/70 p-0 text-popover-foreground shadow-2xl shadow-black/50 ring-1 ring-white/10 backdrop-blur-2xl sm:max-h-[calc(100dvh-2rem)] sm:max-w-lg"
       >
         <div
           aria-hidden
           className="pointer-events-none absolute -top-20 left-1/2 -z-10 h-56 w-100 -translate-x-1/2 rounded-full bg-white/10 blur-3xl"
         />
 
-        <div className="flex flex-col items-center gap-3 border-b border-white/10 px-6 pt-8 pb-6 text-center sm:px-8 sm:pt-9">
-          <span className="relative flex size-10 shrink-0 items-center justify-center">
-            <Hexagon className="size-10 text-gold" strokeWidth={1.5} />
-            <Box className="absolute size-4.5 text-gold" strokeWidth={2} />
+        <div className="flex flex-col items-center gap-2 border-b border-white/10 px-6 pt-5 pb-4 text-center sm:gap-3 sm:px-8 sm:pt-9 sm:pb-6">
+          <span className="relative flex size-8 shrink-0 items-center justify-center sm:size-10">
+            <Hexagon className="size-8 text-gold sm:size-10" strokeWidth={1.5} />
+            <Box className="absolute size-3.5 text-gold sm:size-4.5" strokeWidth={2} />
           </span>
 
           {/* <div className="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-xs font-medium text-gold">
@@ -399,15 +432,12 @@ export function AuthDialog({ open, onOpenChange, mode, onModeChange }) {
             {copy.badge}
           </div> */}
 
-          <DialogTitle className="font-heading text-xl font-semibold text-foreground sm:text-2xl">
+          <DialogTitle className="font-heading text-lg font-semibold text-foreground sm:text-2xl">
             {copy.title}
           </DialogTitle>
-          <p className="max-w-[26ch] text-sm leading-relaxed text-muted-foreground">
-            {copy.description}
-          </p>
         </div>
 
-        <div className="flex flex-col gap-4 px-6 pt-6 pb-8 sm:px-8">
+        <div className="flex flex-col gap-3 px-6 pt-4 pb-5 sm:gap-4 sm:px-8 sm:pt-6 sm:pb-8">
           {mode === "signup" ? (
             <SignupForm
               onSuccess={(name) => {

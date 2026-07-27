@@ -1,13 +1,12 @@
 "use client";
 
-import { Calendar, Store, TrendingUp, Wallet } from "lucide-react";
+import { Calendar, TrendingUp, Wallet } from "lucide-react";
 
 import { EvolutionChart } from "@/components/dashboard/evolution-chart";
 import { OperationalSummary } from "@/components/dashboard/operational-summary";
 import { PerformanceDonut } from "@/components/dashboard/performance-donut";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { StatusPipeline } from "@/components/dashboard/status-pipeline";
-import { TopProducts } from "@/components/dashboard/top-products";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDashboardStats } from "@/hooks/use-dashboard-stats";
@@ -57,39 +56,22 @@ function DashboardHomeSkeleton() {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <Card className="border-none bg-card/60 ring-1 ring-white/10">
-          <CardHeader>
-            <Skeleton className="h-5 w-44" />
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="flex flex-col gap-1.5">
-                <div className="flex items-center justify-between">
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-4 w-8" />
-                </div>
-                <Skeleton className="h-2 w-full rounded-full" />
+      <Card className="border-none bg-card/60 ring-1 ring-white/10">
+        <CardHeader>
+          <Skeleton className="h-5 w-44" />
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div key={index} className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-8" />
               </div>
-            ))}
-          </CardContent>
-        </Card>
-        <Card className="border-none bg-card/60 ring-1 ring-white/10">
-          <CardHeader className="flex-row items-center justify-between">
-            <Skeleton className="h-5 w-36" />
-            <Skeleton className="h-8 w-28 rounded-md" />
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="flex items-center gap-3">
-                <Skeleton className="size-8 shrink-0 rounded-lg" />
-                <Skeleton className="h-4 flex-1" />
-                <Skeleton className="h-4 w-10" />
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      </div>
+              <Skeleton className="h-2 w-full rounded-full" />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -117,10 +99,6 @@ export default function DashboardHomePage() {
             performance de livraison.
           </p>
           <div className="flex flex-wrap gap-3 pt-1">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-background/40 px-3 py-1.5 text-sm text-muted-foreground">
-              <Store className="size-4 text-gold" />
-              Magasin: <span className="text-foreground">{data.storeName}</span>
-            </span>
             <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-background/40 px-3 py-1.5 text-sm text-muted-foreground">
               <Calendar className="size-4 text-gold" />
               Période:{" "}
@@ -160,13 +138,7 @@ export default function DashboardHomePage() {
         <OperationalSummary items={data.operationalSummary} />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <StatusPipeline
-          items={data.statusPipeline}
-          total={data.stats[0].value}
-        />
-        <TopProducts products={data.topProducts} />
-      </div>
+      <StatusPipeline items={data.statusPipeline} total={data.totalColis} />
     </div>
   );
 }

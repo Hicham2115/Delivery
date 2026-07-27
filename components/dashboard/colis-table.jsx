@@ -1,11 +1,16 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Download, Eye, Info, Pencil } from "lucide-react";
+import { isWithinInterval } from "date-fns";
+import { Download, Eye, Pencil, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ColisDateFilter } from "@/components/dashboard/colis-date-filter";
+import { ColisDeleteDialog } from "@/components/dashboard/colis-delete-dialog";
+import { ColisDetailsDialog } from "@/components/dashboard/colis-details-dialog";
+import { ColisEditSheet } from "@/components/dashboard/colis-edit-sheet";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -24,23 +29,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useColis } from "@/hooks/use-colis";
+import { ETAT_BADGE_CLASS, STATUS_BADGE_CLASS } from "@/lib/colis-badges";
+import { getDeliveryFee, getNetAmount } from "@/lib/delivery-fees";
 
 const PAGE_SIZE_OPTIONS = ["10", "25", "50"];
 const ALL = "tous";
 const SKELETON_ROWS = 5;
-
-const ETAT_BADGE_CLASS = {
-  "Facturé": "border-violet-400/40 text-violet-400",
-  "Non facturé": "border-muted-foreground/40 text-muted-foreground",
-};
-
-const STATUS_BADGE_CLASS = {
-  "Livré": "border-emerald-400/40 text-emerald-400",
-  "Ramassage": "border-amber-400/40 text-amber-400",
-  "En cours": "border-sky-400/40 text-sky-400",
-  "Retourné": "border-red-400/40 text-red-400",
-  "Nouveau": "border-gold/40 text-gold",
-};
 
 function exportColisCsv(rows, filename) {
   const header = ["Code d'envoi", "Destinataire", "Téléphone", "Etat", "Status", "Ville", "Prix"];
@@ -65,8 +59,12 @@ export function ColisTable() {
   const [etatFilter, setEtatFilter] = useState(ALL);
   const [statusFilter, setStatusFilter] = useState(ALL);
   const [villeFilter, setVilleFilter] = useState(ALL);
+  const [dateRange, setDateRange] = useState(null);
   const [pageSize, setPageSize] = useState("10");
   const [page, setPage] = useState(1);
+  const [detailsColis, setDetailsColis] = useState(null);
+  const [editingColis, setEditingColis] = useState(null);
+  const [deletingColis, setDeletingColis] = useState(null);
 
   const villes = useMemo(
     () => Array.from(new Set(colis.map((row) => row.ville))).sort(),
@@ -79,13 +77,18 @@ export function ColisTable() {
       if (etatFilter !== ALL && row.etat !== etatFilter) return false;
       if (statusFilter !== ALL && row.status !== statusFilter) return false;
       if (villeFilter !== ALL && row.ville !== villeFilter) return false;
+      if (
+        dateRange &&
+        !isWithinInterval(new Date(row.createdAt), { start: dateRange.from, end: dateRange.to })
+      )
+        return false;
       if (!query) return true;
       return [row.code, row.destinataire, row.telephone, row.ville]
         .join(" ")
         .toLowerCase()
         .includes(query);
     });
-  }, [colis, search, etatFilter, statusFilter, villeFilter]);
+  }, [colis, search, etatFilter, statusFilter, villeFilter, dateRange]);
 
   const pageSizeNumber = Number(pageSize);
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSizeNumber));
@@ -155,16 +158,12 @@ export function ColisTable() {
             </SelectContent>
           </Select>
 
+          <ColisDateFilter
+            range={dateRange}
+            onChange={(range) => resetToFirstPage(() => setDateRange(range))}
+          />
+
           <div className="ml-auto flex flex-wrap gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="py-5"
-              onClick={() => exportColisCsv(filtered, "colis.csv")}
-            >
-              <Download className="size-4" />
-              Exporter les colis
-            </Button>
             <Button
               variant="outline"
               size="sm"
@@ -217,6 +216,8 @@ export function ColisTable() {
                 <TableHead>Status</TableHead>
                 <TableHead>Ville</TableHead>
                 <TableHead>Prix</TableHead>
+                <TableHead>Frais</TableHead>
+                <TableHead>Total net</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -246,6 +247,12 @@ export function ColisTable() {
                       <Skeleton className="h-4 w-14" />
                     </TableCell>
                     <TableCell>
+                      <Skeleton className="h-4 w-14" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-14" />
+                    </TableCell>
+                    <TableCell>
                       <div className="flex justify-end gap-1.5">
                         <Skeleton className="size-7 rounded-md" />
                         <Skeleton className="size-7 rounded-md" />
@@ -256,14 +263,14 @@ export function ColisTable() {
                 ))}
               {isError && (
                 <TableRow>
-                  <TableCell colSpan={8} className="py-8 text-center text-destructive">
+                  <TableCell colSpan={10} className="py-8 text-center text-destructive">
                     Erreur lors du chargement des colis.
                   </TableCell>
                 </TableRow>
               )}
               {!isLoading && !isError && paginated.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={8} className="py-8 text-center text-muted-foreground">
+                  <TableCell colSpan={10} className="py-8 text-center text-muted-foreground">
                     Aucun colis trouvé.
                   </TableCell>
                 </TableRow>
@@ -285,16 +292,37 @@ export function ColisTable() {
                   </TableCell>
                   <TableCell>{row.ville}</TableCell>
                   <TableCell className="font-mono">{row.prix} DH</TableCell>
+                  <TableCell className="font-mono text-muted-foreground">
+                    {getDeliveryFee(row.ville)} DH
+                  </TableCell>
+                  <TableCell className="font-mono font-medium text-foreground">
+                    {getNetAmount(row)} DH
+                  </TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-1.5">
-                      <Button variant="outline" size="icon-sm" aria-label="Voir">
+                      <Button
+                        variant="outline"
+                        size="icon-sm"
+                        aria-label="Voir"
+                        onClick={() => setDetailsColis(row)}
+                      >
                         <Eye className="size-3.5" />
                       </Button>
-                      <Button variant="outline" size="icon-sm" aria-label="Détails">
-                        <Info className="size-3.5" />
-                      </Button>
-                      <Button variant="outline" size="icon-sm" aria-label="Modifier">
+                      <Button
+                        variant="outline"
+                        size="icon-sm"
+                        aria-label="Modifier"
+                        onClick={() => setEditingColis(row)}
+                      >
                         <Pencil className="size-3.5" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon-sm"
+                        aria-label="Supprimer"
+                        onClick={() => setDeletingColis(row)}
+                      >
+                        <Trash2 className="size-3.5" />
                       </Button>
                     </div>
                   </TableCell>
@@ -333,6 +361,19 @@ export function ColisTable() {
           </div>
         </div>
       </CardContent>
+
+      <ColisDetailsDialog
+        colis={detailsColis}
+        onOpenChange={(open) => !open && setDetailsColis(null)}
+      />
+      <ColisEditSheet
+        colis={editingColis}
+        onOpenChange={(open) => !open && setEditingColis(null)}
+      />
+      <ColisDeleteDialog
+        colis={deletingColis}
+        onOpenChange={(open) => !open && setDeletingColis(null)}
+      />
     </Card>
   );
 }

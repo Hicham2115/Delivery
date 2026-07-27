@@ -14,8 +14,8 @@ import {
 } from "@/components/ui/chart";
 
 const chartConfig = {
-  nouveau: { label: "Nouveau", color: "var(--chart-1)" },
-  livre: { label: "Livré", color: "var(--chart-2)" },
+  nouveau: { label: "Créés", color: "var(--gold)" },
+  livre: { label: "Livré", color: "#a78bfa" },
 };
 
 const MODES = ["both", "nouveau", "livre"];
