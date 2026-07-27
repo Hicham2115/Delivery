@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
 import {
   ArrowRight,
@@ -9,6 +10,7 @@ import {
   Loader2,
   Lock,
   Mail,
+  Phone,
   Sparkles,
   User,
 } from "lucide-react";
@@ -19,12 +21,22 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useLogin } from "@/hooks/use-login";
+import { useRegister } from "@/hooks/use-register";
 
 const nameSchema = z
+  .string()
+  .min(2, "Le prénom doit contenir au moins 2 caractères");
+const lastNameSchema = z
   .string()
   .min(2, "Le nom doit contenir au moins 2 caractères");
 const emailSchema = z.string().email("Adresse email invalide");
 const passwordSchema = z.string().min(8, "8 caractères minimum");
+const phoneSchema = z
+  .string()
+  .refine((value) => value === "" || /^[+]?[\d\s()-]{8,20}$/.test(value), {
+    message: "Numéro de téléphone invalide",
+  });
 
 const TRUST_ITEMS = [
   "Aucune carte bancaire requise",
@@ -73,10 +85,20 @@ function SubmitButton({ canSubmit, isSubmitting, label }) {
 }
 
 function SignupForm({ onSuccess }) {
+  const registerMutation = useRegister();
+
   const form = useForm({
-    defaultValues: { name: "", email: "", password: "" },
+    defaultValues: { name: "", lastName: "", email: "", phone: "", password: "" },
     onSubmit: async ({ value }) => {
-      onSuccess(value.name);
+      try {
+        await registerMutation.mutateAsync({
+          ...value,
+          phone: value.phone || undefined,
+        });
+        onSuccess(value.name);
+      } catch {
+        // error toast already surfaced by useRegister's onError
+      }
     },
   });
 
@@ -89,21 +111,75 @@ function SignupForm({ onSuccess }) {
         form.handleSubmit();
       }}
     >
-      <form.Field name="name" validators={{ onChange: nameSchema }}>
+      <div className="grid grid-cols-2 gap-4">
+        <form.Field name="name" validators={{ onSubmit: nameSchema }}>
+          {(field) => (
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor={field.name} className="text-foreground">
+                Prénom
+              </Label>
+              <FieldInput
+                icon={User}
+                id={field.name}
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder="Jean"
+                autoComplete="given-name"
+              />
+              {field.state.meta.errors.length > 0 && (
+                <p className="text-xs text-destructive">
+                  {fieldErrorMessage(field.state.meta.errors)}
+                </p>
+              )}
+            </div>
+          )}
+        </form.Field>
+
+        <form.Field name="lastName" validators={{ onSubmit: lastNameSchema }}>
+          {(field) => (
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor={field.name} className="text-foreground">
+                Nom
+              </Label>
+              <FieldInput
+                icon={User}
+                id={field.name}
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder="Dupont"
+                autoComplete="family-name"
+              />
+              {field.state.meta.errors.length > 0 && (
+                <p className="text-xs text-destructive">
+                  {fieldErrorMessage(field.state.meta.errors)}
+                </p>
+              )}
+            </div>
+          )}
+        </form.Field>
+      </div>
+
+      <form.Field name="phone" validators={{ onSubmit: phoneSchema }}>
         {(field) => (
           <div className="flex flex-col gap-1.5">
             <Label htmlFor={field.name} className="text-foreground">
-              Nom complet
+              Téléphone{" "}
+              <span className="text-muted-foreground">(optionnel)</span>
             </Label>
             <FieldInput
-              icon={User}
+              icon={Phone}
               id={field.name}
               name={field.name}
+              type="tel"
               value={field.state.value}
               onBlur={field.handleBlur}
               onChange={(e) => field.handleChange(e.target.value)}
-              placeholder="Jean Dupont"
-              autoComplete="name"
+              placeholder="+212 6 00 00 00 00"
+              autoComplete="tel"
             />
             {field.state.meta.errors.length > 0 && (
               <p className="text-xs text-destructive">
@@ -114,7 +190,7 @@ function SignupForm({ onSuccess }) {
         )}
       </form.Field>
 
-      <form.Field name="email" validators={{ onChange: emailSchema }}>
+      <form.Field name="email" validators={{ onSubmit: emailSchema }}>
         {(field) => (
           <div className="flex flex-col gap-1.5">
             <Label htmlFor={field.name} className="text-foreground">
@@ -140,7 +216,7 @@ function SignupForm({ onSuccess }) {
         )}
       </form.Field>
 
-      <form.Field name="password" validators={{ onChange: passwordSchema }}>
+      <form.Field name="password" validators={{ onSubmit: passwordSchema }}>
         {(field) => (
           <div className="flex flex-col gap-1.5">
             <Label htmlFor={field.name} className="text-foreground">
@@ -194,10 +270,17 @@ function SignupForm({ onSuccess }) {
 }
 
 function LoginForm({ onSuccess }) {
+  const loginMutation = useLogin();
+
   const form = useForm({
     defaultValues: { email: "", password: "" },
     onSubmit: async ({ value }) => {
-      onSuccess(value.email);
+      try {
+        await loginMutation.mutateAsync(value);
+        onSuccess(value.email);
+      } catch {
+        // error toast already surfaced by useLogin's onError
+      }
     },
   });
 
@@ -210,7 +293,7 @@ function LoginForm({ onSuccess }) {
         form.handleSubmit();
       }}
     >
-      <form.Field name="email" validators={{ onChange: emailSchema }}>
+      <form.Field name="email" validators={{ onSubmit: emailSchema }}>
         {(field) => (
           <div className="flex flex-col gap-1.5">
             <Label htmlFor={field.name} className="text-foreground">
@@ -236,7 +319,7 @@ function LoginForm({ onSuccess }) {
         )}
       </form.Field>
 
-      <form.Field name="password" validators={{ onChange: passwordSchema }}>
+      <form.Field name="password" validators={{ onSubmit: passwordSchema }}>
         {(field) => (
           <div className="flex flex-col gap-1.5">
             <Label htmlFor={field.name} className="text-foreground">
@@ -291,20 +374,21 @@ const COPY = {
 };
 
 export function AuthDialog({ open, onOpenChange, mode, onModeChange }) {
+  const router = useRouter();
   const copy = COPY[mode];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton
-        className="dark w-full max-w-md gap-0 overflow-hidden rounded-2xl border border-white/15 bg-black/70 p-0 text-popover-foreground shadow-2xl shadow-black/50 ring-1 ring-white/10 backdrop-blur-2xl sm:max-w-lg"
+        className="dark flex max-h-[calc(100vh-2rem)] w-full max-w-md flex-col gap-0 overflow-x-hidden overflow-y-auto rounded-2xl border border-white/15 bg-black/70 p-0 text-popover-foreground shadow-2xl shadow-black/50 ring-1 ring-white/10 backdrop-blur-2xl sm:max-w-lg"
       >
         <div
           aria-hidden
           className="pointer-events-none absolute -top-20 left-1/2 -z-10 h-56 w-100 -translate-x-1/2 rounded-full bg-white/10 blur-3xl"
         />
 
-        <div className="flex flex-col items-center gap-3 border-b border-white/10 px-8 pt-9 pb-6 text-center">
+        <div className="flex flex-col items-center gap-3 border-b border-white/10 px-6 pt-8 pb-6 text-center sm:px-8 sm:pt-9">
           <span className="relative flex size-10 shrink-0 items-center justify-center">
             <Hexagon className="size-10 text-gold" strokeWidth={1.5} />
             <Box className="absolute size-4.5 text-gold" strokeWidth={2} />
@@ -315,7 +399,7 @@ export function AuthDialog({ open, onOpenChange, mode, onModeChange }) {
             {copy.badge}
           </div> */}
 
-          <DialogTitle className="font-heading text-2xl font-semibold text-foreground">
+          <DialogTitle className="font-heading text-xl font-semibold text-foreground sm:text-2xl">
             {copy.title}
           </DialogTitle>
           <p className="max-w-[26ch] text-sm leading-relaxed text-muted-foreground">
@@ -323,12 +407,13 @@ export function AuthDialog({ open, onOpenChange, mode, onModeChange }) {
           </p>
         </div>
 
-        <div className="flex flex-col gap-4 px-8 pt-6 pb-8">
+        <div className="flex flex-col gap-4 px-6 pt-6 pb-8 sm:px-8">
           {mode === "signup" ? (
             <SignupForm
               onSuccess={(name) => {
                 toast.success(`Bienvenue, ${name} ! Votre compte a été créé.`);
                 onOpenChange(false);
+                router.push("/dashboard");
               }}
             />
           ) : (
@@ -336,6 +421,7 @@ export function AuthDialog({ open, onOpenChange, mode, onModeChange }) {
               onSuccess={(email) => {
                 toast.success(`Content de vous revoir, ${email} !`);
                 onOpenChange(false);
+                router.push("/dashboard");
               }}
             />
           )}

@@ -1,8 +1,11 @@
+"use client";
+import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, Phone, Rocket } from "lucide-react";
 
 import { Reveal } from "@/components/reveal";
 import { Button } from "@/components/ui/button";
+import { AuthDialog } from "@/components/auth-dialog";
 
 const TRUST_ITEMS = [
   "Aucune carte bancaire requise",
@@ -11,6 +14,14 @@ const TRUST_ITEMS = [
 ];
 
 export function Cta() {
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState("signup");
+
+  const openAuth = (mode) => {
+    setAuthMode(mode);
+    setAuthOpen(true);
+  };
+
   return (
     <section className="dark relative isolate overflow-hidden bg-background py-20 sm:py-24 lg:py-28">
       <div className="mx-auto max-w-7xl px-4">
@@ -41,8 +52,7 @@ export function Cta() {
               <Button
                 size="lg"
                 className="h-12 w-full gap-2 rounded-lg bg-gold px-6 text-base text-gold-foreground hover:bg-gold/85 sm:w-auto"
-                nativeButton={false}
-                render={<Link href="/signup" />}
+                onClick={() => openAuth("signup")}
               >
                 Créer une Commande
                 <ArrowRight />
@@ -51,8 +61,7 @@ export function Cta() {
                 size="lg"
                 variant="outline"
                 className="h-12 w-full gap-2 rounded-lg border-copper/30 px-6 text-base text-copper hover:bg-copper/10 hover:text-copper sm:w-auto"
-                nativeButton={false}
-                render={<Link href="/contact" />}
+                // onClick={() => openAuth("signup")}
               >
                 <Phone />
                 Contacter les Ventes
@@ -73,6 +82,13 @@ export function Cta() {
           </div>
         </Reveal>
       </div>
+
+      <AuthDialog
+        open={authOpen}
+        onOpenChange={setAuthOpen}
+        mode={authMode}
+        onModeChange={setAuthMode}
+      />
     </section>
   );
 }

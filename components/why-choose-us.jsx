@@ -1,3 +1,5 @@
+"use client";
+import { useState } from "react";
 import Link from "next/link";
 import {
   Award,
@@ -13,6 +15,7 @@ import {
 import { Reveal } from "@/components/reveal";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { AuthDialog } from "@/components/auth-dialog";
 
 const BENEFITS = [
   {
@@ -54,6 +57,14 @@ const BENEFITS = [
 ];
 
 export function WhyChooseUs() {
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState("signup");
+
+  const openAuth = (mode) => {
+    setAuthMode(mode);
+    setAuthOpen(true);
+  };
+
   return (
     <section className="dark relative isolate overflow-hidden bg-background py-20 sm:py-24 lg:py-28">
       <div
@@ -89,9 +100,8 @@ export function WhyChooseUs() {
 
             <Button
               size="lg"
-              className="h-12 gap-2 rounded-lg bg-gold px-6 text-base text-gold-foreground hover:bg-gold/85"
-              nativeButton={false}
-              render={<Link href="/signup" />}
+              className="h-12 gap-2 rounded-lg bg-gold font-semibold px-6 text-base text-gold-foreground hover:bg-gold/85"
+              onClick={() => openAuth("signup")}
             >
               Commencer
               <ArrowRight />
@@ -130,6 +140,13 @@ export function WhyChooseUs() {
           </div>
         </div>
       </div>
+
+      <AuthDialog
+        open={authOpen}
+        onOpenChange={setAuthOpen}
+        mode={authMode}
+        onModeChange={setAuthMode}
+      />
     </section>
   );
 }

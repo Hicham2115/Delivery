@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -16,6 +17,8 @@ import { Reveal } from "@/components/reveal";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import heroImage from "@/app/assets/hero.png";
+import { AuthDialog } from "@/components/auth-dialog";
+import { useState } from "react";
 
 const FEATURES = [
   {
@@ -48,6 +51,14 @@ const STEPS = [
 ];
 
 export function Hero() {
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState("signup");
+
+  const openAuth = (mode) => {
+    setAuthMode(mode);
+    setAuthOpen(true);
+  };
+
   return (
     <section className="dark relative isolate overflow-hidden bg-background lg:min-h-170">
       <div className="absolute inset-0 -z-10">
@@ -83,8 +94,7 @@ export function Hero() {
             <Button
               size="lg"
               className="h-12 w-full font-semibold gap-2 rounded-lg bg-gold px-6 text-base text-gold-foreground hover:bg-gold/85 sm:w-auto"
-              nativeButton={false}
-              render={<Link href="/signup" />}
+              onClick={() => openAuth("signup")}
             >
               <Package />
               Créer une Commande
@@ -94,8 +104,7 @@ export function Hero() {
               size="lg"
               variant="outline"
               className="h-12 w-full gap-2 font-semibold rounded-lg border-border bg-background/40 px-6 text-white   backdrop-blur-sm sm:w-auto"
-              nativeButton={false}
-              render={<Link href="/track" />}
+              onClick={() => openAuth("login")}
             >
               <CirclePlay />
               Suivre une Commande
@@ -183,6 +192,13 @@ export function Hero() {
           </div>
         </Reveal>
       </div>
+
+      <AuthDialog
+        open={authOpen}
+        onOpenChange={setAuthOpen}
+        mode={authMode}
+        onModeChange={setAuthMode}
+      />
     </section>
   );
 }

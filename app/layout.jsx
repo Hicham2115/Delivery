@@ -1,8 +1,6 @@
 import { Geist_Mono, Montserrat, Playfair_Display } from "next/font/google";
-import { Footer } from "@/components/layout/footer";
-import { Header } from "@/components/layout/header";
-import { SmoothScroll } from "@/components/layout/smooth-scroll";
 import { SplashScreen } from "@/components/layout/splash-screen";
+import { QueryProvider } from "@/components/providers/query-provider";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
@@ -31,16 +29,14 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="fr"
-      className={`${montserrat.variable} ${geistMono.variable} ${playfairDisplay.variable} h-full antialiased`}
+      className={`dark ${montserrat.variable} ${geistMono.variable} ${playfairDisplay.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <SplashScreen />
-        <SmoothScroll>
-          <Header />
+        <QueryProvider>
+          <SplashScreen />
           {children}
-          <Footer />
-        </SmoothScroll>
-        <Toaster position="top-center" richColors />
+          <Toaster position="top-center" richColors />
+        </QueryProvider>
       </body>
     </html>
   );

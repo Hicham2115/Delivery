@@ -22,7 +22,7 @@ export function SplashScreen() {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-black"
+          className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-linear-to-br from-stone-900 via-neutral-900 to-stone-800"
         >
           <div
             aria-hidden
