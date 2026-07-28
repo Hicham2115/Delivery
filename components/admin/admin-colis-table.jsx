@@ -25,6 +25,7 @@ import { useAdminColis } from "@/hooks/use-admin-colis";
 import { STATUS_VALUES, ETAT_VALUES, useAdminUpdateColis } from "@/hooks/use-admin-update-colis";
 import { ETAT_BADGE_CLASS, STATUS_BADGE_CLASS } from "@/lib/colis-badges";
 import { getDeliveryFee, getNetAmount } from "@/lib/delivery-fees";
+import { cn } from "@/lib/utils";
 
 const SKELETON_ROWS = 5;
 
@@ -123,8 +124,15 @@ export function AdminColisTable() {
                         })
                       }
                     >
-                      <SelectTrigger className="w-32" size="sm">
-                        <Badge variant="outline" className={ETAT_BADGE_CLASS[row.etat]}>
+                      <SelectTrigger
+                        size="sm"
+                        className="w-fit min-w-28 justify-start gap-1 border-none bg-transparent p-0 shadow-none hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent"
+                      >
+                        <Badge
+                          variant="outline"
+                          className={cn("gap-1.5 border px-2.5 py-1", ETAT_BADGE_CLASS[row.etat])}
+                        >
+                          <span className="size-1.5 rounded-full bg-current" />
                           {row.etat}
                         </Badge>
                       </SelectTrigger>
@@ -147,8 +155,15 @@ export function AdminColisTable() {
                         })
                       }
                     >
-                      <SelectTrigger className="w-32" size="sm">
-                        <Badge variant="outline" className={STATUS_BADGE_CLASS[row.status]}>
+                      <SelectTrigger
+                        size="sm"
+                        className="w-fit min-w-28 justify-start gap-1 border-none bg-transparent p-0 shadow-none hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent"
+                      >
+                        <Badge
+                          variant="outline"
+                          className={cn("gap-1.5 border px-2.5 py-1", STATUS_BADGE_CLASS[row.status])}
+                        >
+                          <span className="size-1.5 rounded-full bg-current" />
                           {row.status}
                         </Badge>
                       </SelectTrigger>

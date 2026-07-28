@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Box, Hexagon, Package } from "lucide-react";
+import { Box, Hexagon, Package, Users } from "lucide-react";
 
 import {
   Sidebar,
@@ -15,7 +15,10 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-const NAV_ITEMS = [{ label: "Colis", href: "/admin", icon: Package }];
+const NAV_ITEMS = [
+  { label: "Colis", href: "/admin", icon: Package },
+  { label: "Clients", href: "/admin/clients", icon: Users },
+];
 
 export function AdminSidebar() {
   const pathname = usePathname();

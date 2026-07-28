@@ -1,7 +1,9 @@
 "use client";
 
-import { Calendar, TrendingUp, Wallet } from "lucide-react";
+import { useState } from "react";
+import { TrendingUp, Wallet } from "lucide-react";
 
+import { ColisDateFilter } from "@/components/dashboard/colis-date-filter";
 import { EvolutionChart } from "@/components/dashboard/evolution-chart";
 import { OperationalSummary } from "@/components/dashboard/operational-summary";
 import { PerformanceDonut } from "@/components/dashboard/performance-donut";
@@ -77,7 +79,8 @@ function DashboardHomeSkeleton() {
 }
 
 export default function DashboardHomePage() {
-  const { data, isPending } = useDashboardStats();
+  const [dateRange, setDateRange] = useState(null);
+  const { data, isPending } = useDashboardStats(dateRange);
 
   if (isPending || !data) {
     return <DashboardHomeSkeleton />;
@@ -99,13 +102,7 @@ export default function DashboardHomePage() {
             performance de livraison.
           </p>
           <div className="flex flex-wrap gap-3 pt-1">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-background/40 px-3 py-1.5 text-sm text-muted-foreground">
-              <Calendar className="size-4 text-gold" />
-              Période:{" "}
-              <span className="text-foreground">
-                {data.period.from} - {data.period.to}
-              </span>
-            </span>
+            <ColisDateFilter range={dateRange} onChange={setDateRange} />
             <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-background/40 px-3 py-1.5 text-sm text-muted-foreground">
               <Wallet className="size-4 text-gold" />
               Net livré:{" "}

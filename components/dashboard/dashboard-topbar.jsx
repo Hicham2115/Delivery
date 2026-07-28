@@ -75,7 +75,7 @@ export function DashboardTopbar() {
           <PopoverTrigger
             render={
               <button type="button" aria-label="Compte" className="cursor-pointer">
-                <Avatar>
+                <Avatar className="size-9">
                   <AvatarFallback className="bg-gold/15 text-gold">
                     {getInitials(me) || "..."}
                   </AvatarFallback>
