@@ -309,8 +309,8 @@ function LoginForm({ onSuccess }) {
     defaultValues: { email: "", password: "" },
     onSubmit: async ({ value }) => {
       try {
-        await loginMutation.mutateAsync(value);
-        onSuccess(value.email);
+        const { user } = await loginMutation.mutateAsync(value);
+        onSuccess(user);
       } catch {
         // error toast already surfaced by useLogin's onError
       }
@@ -448,10 +448,11 @@ export function AuthDialog({ open, onOpenChange, mode, onModeChange }) {
             />
           ) : (
             <LoginForm
-              onSuccess={(email) => {
-                toast.success(`Content de vous revoir, ${email} !`);
+              onSuccess={(user) => {
+                toast.success(`Content de vous revoir, ${user.email} !`);
                 onOpenChange(false);
-                router.push("/dashboard");
+                const isAdmin = user.role === "ADMIN" || user.role === "SUPER_ADMIN";
+                router.push(isAdmin ? "/admin" : "/dashboard");
               }}
             />
           )}

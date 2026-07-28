@@ -1,18 +1,35 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Eye, EyeOff, Wallet } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Eye, EyeOff, LogOut, Settings, Wallet } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { NotificationsPopover } from "@/components/dashboard/notifications-popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useColis } from "@/hooks/use-colis";
+import { useLogout } from "@/hooks/use-logout";
+import { useMe } from "@/hooks/use-me";
 import { getNetAmount } from "@/lib/delivery-fees";
 
+function getInitials(user) {
+  if (!user) return "";
+  return `${user.name?.[0] ?? ""}${user.lastName?.[0] ?? ""}`.toUpperCase();
+}
+
 export function DashboardTopbar() {
+  const router = useRouter();
+  const logoutMutation = useLogout();
   const [showBalance, setShowBalance] = useState(false);
   const { data: colis = [] } = useColis();
+  const { data: me } = useMe();
 
   const balance = useMemo(
     () =>
@@ -54,9 +71,39 @@ export function DashboardTopbar() {
 
       <div className="flex items-center gap-3">
         <NotificationsPopover />
-        <Avatar>
-          <AvatarFallback className="bg-gold/15 text-gold">SW</AvatarFallback>
-        </Avatar>
+        <Popover>
+          <PopoverTrigger
+            render={
+              <button type="button" aria-label="Compte" className="cursor-pointer">
+                <Avatar>
+                  <AvatarFallback className="bg-gold/15 text-gold">
+                    {getInitials(me) || "..."}
+                  </AvatarFallback>
+                </Avatar>
+              </button>
+            }
+          />
+          <PopoverContent className="w-44 p-1" align="end">
+            <Link
+              href="/dashboard/settings"
+              className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm text-foreground hover:bg-muted"
+            >
+              <Settings className="size-3.5" />
+              Paramètres
+            </Link>
+            <button
+              type="button"
+              onClick={async () => {
+                await logoutMutation.mutateAsync();
+                router.push("/");
+              }}
+              className="flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm text-destructive hover:bg-muted"
+            >
+              <LogOut className="size-3.5" />
+              Déconnexion
+            </button>
+          </PopoverContent>
+        </Popover>
       </div>
     </header>
   );
